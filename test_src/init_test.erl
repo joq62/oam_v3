@@ -76,7 +76,8 @@ start()->
 %% -------------------------------------------------------------------
 first_cluster()->
   %  io:format("service_catalog ~p~n",[{db_service_catalog:read_all(),?MODULE,?FUNCTION_NAME,?LINE}]),
-    oam:new_cluster(), 
+    gl=oam:new_cluster(), 
+
     io:format("db_deploy_state ~p~n",[{db_deploy_state:read_all(),?MODULE,?FUNCTION_NAME,?LINE}]),
     io:format("sd:all() ~p~n",[{sd:all(),?MODULE,?FUNCTION_NAME,?LINE}]),
 

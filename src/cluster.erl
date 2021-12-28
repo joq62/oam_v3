@@ -87,7 +87,11 @@ restart_hosts_nodes()->
     Ids=db_host:ids(),
     Result=case map_ssh_start(Ids) of
 	       {ok,StartRes}->
-		   [rpc:call(N,os,cmd,["rm -rf *.pod"],5*1000)||{ok,[_Id,N]}<-StartRes],
+		   io:format("StartRes ~p~n",[{StartRes,?MODULE,?FUNCTION_NAME,?LINE}]),
+		   %[rpc:call(N,os,cmd,["rm -rf *.pod"],5*1000)||{_Id,N}<-StartRes],
+		   [{_Id,Node1}|_]=StartRes,
+		   [rpc:call(Node1,net_adm,ping,[N],5*1000)||{_Id,N}<-StartRes],
+		   
 		   {ok,StartRes};
 	       {error,StartRes}->
 		   {error,StartRes}  

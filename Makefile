@@ -43,6 +43,7 @@ unit_test:
 	erlc -D unit_test -I ../../include -I ../controller/include -o test_ebin test_src/*.erl;
 	erl -pa ebin -pa test_ebin\
 	    -setcookie cookie_test\
+	    -hidden\
 	    -sname oam\
 	    -unit_test monitor_node test\
 	    -unit_test cluster_id test\
