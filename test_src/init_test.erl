@@ -76,10 +76,23 @@ start()->
 %% -------------------------------------------------------------------
 first_cluster()->
   %  io:format("service_catalog ~p~n",[{db_service_catalog:read_all(),?MODULE,?FUNCTION_NAME,?LINE}]),
-    gl=oam:new_cluster(), 
+    {ok,AppInfo}=oam:new_cluster(), 
+    io:format(" AppInfo ~p~n",[{AppInfo,?MODULE,?FUNCTION_NAME,?LINE}]),
+    CtrlNodes=[N||{bully,_Vsn,_Dir,N}<-AppInfo],
+    [CtrlNode|_]=CtrlNodes,
+    io:format("CtrlNode, sd:all() ~p~n",[{rpc:call(CtrlNode,sd,all,[],5*1000),?MODULE,?FUNCTION_NAME,?LINE}]),
+    io:format(" who_isleader ~p~n",[{rpc:call(CtrlNode,bully,who_is_leader,[],5*1000),?MODULE,?FUNCTION_NAME,?LINE}]),
+%    SdNodes=[N||{_Id,N,_Dir,sd,_Vsn}<-AppInfo],
+%    io:format(" SdNodes ~p~n",[{SdNodes,?MODULE,?FUNCTION_NAME,?LINE}]),
+ %   [SdNode|_]=SdNodes,
+ %   io:format("db_deploy_state ~p~n",[{db_deploy_state:read_all(),?MODULE,?FUNCTION_NAME,?LINE}]),
+  %  io:format("SdNode, sd:all() ~p~n",[{rpc:call(SdNode,sd,all,[],5*1000),?MODULE,?FUNCTION_NAME,?LINE}]),
 
-    io:format("db_deploy_state ~p~n",[{db_deploy_state:read_all(),?MODULE,?FUNCTION_NAME,?LINE}]),
-    io:format("sd:all() ~p~n",[{sd:all(),?MODULE,?FUNCTION_NAME,?LINE}]),
+  %  io:format(" who_isleader ~p~n",[{rpc:call(SdNode,bully,who_is_leader,[],5*1000),?MODULE,?FUNCTION_NAME,?LINE}]),
+  %  io:format("mnesia:system_info() ~p~n",[{rpc:call(SdNode,mnesia,system_info,[],5*1000),?MODULE,?FUNCTION_NAME,?LINE}]),
+
+    
+    
 
 
 

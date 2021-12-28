@@ -69,7 +69,7 @@ init([]) ->
 %%          {stop, Reason, State}            (terminate/2 is called)
 %% --------------------------------------------------------------------
 handle_call({new_cluster},_From,State) ->
-    Reply=rpc:call(node(),cluster,new,[],2*10*1000),
+    Reply=rpc:call(node(),cluster,new,[],5*10*1000),
     {reply, Reply, State};
 
 

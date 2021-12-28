@@ -26,40 +26,18 @@ new()->
     Result=case restart_hosts_nodes() of
 	       {error,StartRes}->
 		   {error,StartRes};
-	       {ok,HostIdNodesList}-> %[{HostId,HostNode}]
-		   %% load infra in Host
-		   case start_infra(HostIdNodesList) of
+	       {ok,HostIdNodesList}->
+		   %%
+		%   io:format("HostIdNodesList ~p~n",[{HostIdNodesList,?MODULE,?FUNCTION_NAME,?LINE}]),
+		   case deploy_infra() of
 		       {error,Reason}->
 			   {error,Reason};
-		       {ok,StartList}->
-			   {ok,StartList}
+		       {ok,AppInfo}->
+			    {ok,AppInfo}
 		   end
 	   end,
     Result.
 
-start_infra(HostIdNodesList)->
-    start_infra(HostIdNodesList,[]).
-start_infra([],StartRes)->
-    {ok,StartRes};
-start_infra([{HostId,HostNode}|T],Acc)->
-    PodDir=db_host:application_dir(HostId),
-    Pod=HostNode,
-    Env=[],
-    {SdApp,SdVsn,SdGitPath}=db_service_catalog:read({sd,"1.0.0"}),
-    ok=pod:load_app(Pod,PodDir, {SdApp,SdVsn,SdGitPath}),
-    ok=pod:start_app(Pod,SdApp,Env),
-    LoadStartRes=case db_host:type(HostId) of
-		     no_auto_erl_worker->
-			 [{SdApp,SdVsn,PodDir,Pod}];
-		     auto_erl_controller->
-			 {BullyApp,BullyVsn,BullyGitPath}=db_service_catalog:read({bully,"0.1.0"}),
-			 ok=pod:load_app(Pod,PodDir, {BullyApp,BullyVsn,BullyGitPath}),
-			 ok=pod:start_app(Pod,BullyApp,Env),
-			 [{SdApp,SdVsn,PodDir,Pod},{BullyApp,BullyVsn,PodDir,Pod}]
-		 end,
-    NewAcc=lists:append([LoadStartRes,Acc]),
-    start_infra(T,NewAcc).				      
-	
 %% --------------------------------------------------------------------
 %% Function:start/0 
 %% Description: Initiate the eunit tests, set upp needed processes etc
