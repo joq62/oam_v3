@@ -53,7 +53,9 @@ desired_state()->
 init([]) ->
     ok=application:start(sd),
     ok=application:start(dbase_infra),
-    ok=dbase_infra:init_dynamic(),
+  
+    io:format("mnesia:system_info ~p~n",[{rpc:call(node(),mnesia,system_info,[],5*1000),?MODULE,?FUNCTION_NAME,?LINE}]),
+    io:format("db_service_catalog:read_all() ~p~n",[{node(),db_service_catalog:read_all(),?MODULE,?FUNCTION_NAME,?LINE}]),
     
     {ok, #state{}
     }.

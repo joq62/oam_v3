@@ -81,43 +81,25 @@ first_cluster()->
     CtrlNodes=[N||{bully,_Vsn,_Dir,N}<-AppInfo],
     [CtrlNode|_]=CtrlNodes,
     io:format("CtrlNode, sd:all() ~p~n",[{rpc:call(CtrlNode,sd,all,[],5*1000),?MODULE,?FUNCTION_NAME,?LINE}]),
-    io:format(" who_isleader ~p~n",[{rpc:call(CtrlNode,bully,who_is_leader,[],5*1000),?MODULE,?FUNCTION_NAME,?LINE}]),
-%    SdNodes=[N||{_Id,N,_Dir,sd,_Vsn}<-AppInfo],
-%    io:format(" SdNodes ~p~n",[{SdNodes,?MODULE,?FUNCTION_NAME,?LINE}]),
- %   [SdNode|_]=SdNodes,
- %   io:format("db_deploy_state ~p~n",[{db_deploy_state:read_all(),?MODULE,?FUNCTION_NAME,?LINE}]),
-  %  io:format("SdNode, sd:all() ~p~n",[{rpc:call(SdNode,sd,all,[],5*1000),?MODULE,?FUNCTION_NAME,?LINE}]),
-
-  %  io:format(" who_isleader ~p~n",[{rpc:call(SdNode,bully,who_is_leader,[],5*1000),?MODULE,?FUNCTION_NAME,?LINE}]),
-  %  io:format("mnesia:system_info() ~p~n",[{rpc:call(SdNode,mnesia,system_info,[],5*1000),?MODULE,?FUNCTION_NAME,?LINE}]),
+    timer:sleep(1000),
+    host1@c100=rpc:call(host3@c100,bully,who_is_leader,[],5*1000),
+    io:format(" who_is_leader ~p~n",[{rpc:call(CtrlNode,bully,who_is_leader,[],5*1000),?MODULE,?FUNCTION_NAME,?LINE}]),
 
     
+    %%
+    DbaseNodes=rpc:call(CtrlNode,sd,get,[dbase_infra],5*1000),
+    io:format("DbaseNodes ~p~n",[{DbaseNodes,?MODULE,?FUNCTION_NAME,?LINE}]),
+    X1=[{N,rpc:call(N,db_service_catalog,read_all,[],5*1000)}||N<-DbaseNodes],
+    io:format("db_service_catalog ~p~n",[{X1,?MODULE,?FUNCTION_NAME,?LINE}]),
+    X2=[{N,rpc:call(N,mnesia,system_info,[],5*1000)}||N<-DbaseNodes],
+    io:format("mnesia:system_info ~p~n",[{X2,?MODULE,?FUNCTION_NAME,?LINE}]),
     
-
-
-
- %% Step 1. Initiate the boot_loader node that creates the cluster
-    %% Shall be hidden 
- %   ok=start_loader(),
-  %  {ok,_StartRes}=restart_hosts_nodes(),
-    %% Host nodes are started 
-
-  %  ok=load_deployment({"infra_1","1.0.0"}),
-%    io:format("db_deploy_state ~p~n",[{db_deploy_state:read_all(),?MODULE,?FUNCTION_NAME,?LINE}]),
-    %% delete old pods dirs
-   % timer:sleep(1000),
-  %  io:format("sd:all() ~p~n",[{sd:all(),?MODULE,?FUNCTION_NAME,?LINE}]),
-    % Load sd,bully ,dbase_infra, controller same pod
- %   NodeName=integer_to_list(erlang:system_time(millisecond))++"_infra",
- %   Dir=NodeName++".pod",
-    
-
     
 
     
     
     ok.
-   % nok=nodes().
+
   
 %% --------------------------------------------------------------------
 %% Function:start/0 

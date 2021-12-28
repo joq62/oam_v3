@@ -30,6 +30,7 @@ new()->
 		   %% load infra in Host
 		   case start_infra(HostIdNodesList) of
 		       {error,Reason}->
+			   
 			   {error,Reason};
 		       {ok,StartList}->
 			   {ok,StartList}
@@ -45,6 +46,7 @@ start_infra([{HostId,HostNode}|T],Acc)->
     PodDir=db_host:application_dir(HostId),
     Pod=HostNode,
     Env=[],
+    %% sd
     {SdApp,SdVsn,SdGitPath}=db_service_catalog:read({sd,"1.0.0"}),
     ok=pod:load_app(Pod,PodDir, {SdApp,SdVsn,SdGitPath}),
     ok=pod:start_app(Pod,SdApp,Env),
@@ -52,11 +54,32 @@ start_infra([{HostId,HostNode}|T],Acc)->
 		     no_auto_erl_worker->
 			 [{SdApp,SdVsn,PodDir,Pod}];
 		     auto_erl_controller->
+			 %% controller
+			 %% bully
 			 {BullyApp,BullyVsn,BullyGitPath}=db_service_catalog:read({bully,"0.1.0"}),
 			 ok=pod:load_app(Pod,PodDir, {BullyApp,BullyVsn,BullyGitPath}),
 			 ok=pod:start_app(Pod,BullyApp,Env),
-			 [{SdApp,SdVsn,PodDir,Pod},{BullyApp,BullyVsn,PodDir,Pod}]
+			 timer:sleep(2000),
+			 %% dbase_infra
+			 {DbaseApp,DbaseVsn,DbaseGitPath}=db_service_catalog:read({dbase_infra,"1.0.0"}),
+			 ok=pod:load_app(Pod,PodDir, {DbaseApp,DbaseVsn,DbaseGitPath}),
+			 ok=pod:start_app(Pod,DbaseApp,Env),
+			 %% logger_infra
+			 {LoggerApp,LoggerVsn,LoggerGitPath}=db_service_catalog:read({logger_infra,"1.0.0"}),
+			 ok=pod:load_app(Pod,PodDir, {LoggerApp,LoggerVsn,LoggerGitPath}),
+			 ok=pod:start_app(Pod,LoggerApp,Env),
+			 [{SdApp,SdVsn,PodDir,Pod},{DbaseApp,DbaseVsn,PodDir,Pod},
+			  {BullyApp,BullyVsn,PodDir,Pod},{LoggerApp,LoggerVsn,PodDir,Pod}]
 		 end,
+    io:format("Pod,LoadStartRes ~p~n",[{Pod, LoadStartRes,?MODULE,?FUNCTION_NAME,?LINE}]),
+  %  io:format("Pod,rpc:call(Pod,sd,get,[bully],5*1000) ~p~n",[{Pod, rpc:call(Pod,sd,get,[bully],5*1000),?MODULE,?FUNCTION_NAME,?LINE}]),
+    case rpc:call(Pod,sd,get,[bully],5*1000) of
+	[]->
+	    io:format(" bully not installed ~p~n",[{?MODULE,?FUNCTION_NAME,?LINE}]);
+	[BullyNode|_]->
+	    io:format("who_is_leader ~p~n",[{rpc:call(BullyNode,bully,who_is_leader,[],5*1000),?MODULE,?FUNCTION_NAME,?LINE}])
+    end,
+    
     NewAcc=lists:append([LoadStartRes,Acc]),
     start_infra(T,NewAcc).				      
 	
