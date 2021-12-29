@@ -78,12 +78,13 @@ first_cluster()->
   %  io:format("service_catalog ~p~n",[{db_service_catalog:read_all(),?MODULE,?FUNCTION_NAME,?LINE}]),
     {ok,AppInfo}=oam:new_cluster(), 
     io:format(" AppInfo ~p~n",[{AppInfo,?MODULE,?FUNCTION_NAME,?LINE}]),
-    CtrlNodes=[N||{bully,_Vsn,_Dir,N}<-AppInfo],
-    [CtrlNode|_]=CtrlNodes,
+
+    %% 
+    [CtrlNode|_]=[N||{{"controller","1.0.0"},N,_Dir,_App,Vsn}<-AppInfo],
+    
     io:format("CtrlNode, sd:all() ~p~n",[{rpc:call(CtrlNode,sd,all,[],5*1000),?MODULE,?FUNCTION_NAME,?LINE}]),
     timer:sleep(1000),
-    host1@c100=rpc:call(host3@c100,bully,who_is_leader,[],5*1000),
-    io:format(" who_is_leader ~p~n",[{rpc:call(CtrlNode,bully,who_is_leader,[],5*1000),?MODULE,?FUNCTION_NAME,?LINE}]),
+   io:format(" who_is_leader ~p~n",[{rpc:call(CtrlNode,bully,who_is_leader,[],5*1000),?MODULE,?FUNCTION_NAME,?LINE}]),
 
     
     %%
@@ -94,6 +95,8 @@ first_cluster()->
     X2=[{N,rpc:call(N,mnesia,system_info,[],5*1000)}||N<-DbaseNodes],
     io:format("mnesia:system_info ~p~n",[{X2,?MODULE,?FUNCTION_NAME,?LINE}]),
     
+    %%
+    io:format("db_deploy_state ~p~n",[{db_deploy_state:read_all(),?MODULE,?FUNCTION_NAME,?LINE}]),
     
 
     
