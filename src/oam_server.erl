@@ -51,11 +51,6 @@ desired_state()->
 %%          {stop, Reason}
 %% --------------------------------------------------------------------
 init([]) ->
-    ok=application:start(sd),
-    ok=application:start(dbase_infra),
-  
- %   io:format("mnesia:system_info ~p~n",[{rpc:call(node(),mnesia,system_info,[],5*1000),?MODULE,?FUNCTION_NAME,?LINE}]),
-  %  io:format("db_service_catalog:read_all() ~p~n",[{node(),db_service_catalog:read_all(),?MODULE,?FUNCTION_NAME,?LINE}]),
     
     {ok, #state{}
     }.
@@ -70,6 +65,14 @@ init([]) ->
 %%          {stop, Reason, Reply, State}   | (terminate/2 is called)
 %%          {stop, Reason, State}            (terminate/2 is called)
 %% --------------------------------------------------------------------
+handle_call({first},_From,State) ->
+    Reply=rpc:call(node(),loader,first,[],2*60*1000),
+    {reply, Reply, State};
+
+handle_call({first,FirstHostId,DepId},_From,State) ->
+    Reply=rpc:call(node(),loader,first,[FirstHostId,DepId],2*60*1000),
+    {reply, Reply, State};
+
 handle_call({new_cluster},_From,State) ->
     Reply=rpc:call(node(),cluster,new,[],5*10*1000),
     {reply, Reply, State};

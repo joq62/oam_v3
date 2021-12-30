@@ -18,6 +18,10 @@
 -define(SERVER,oam_server).
 %% --------------------------------------------------------------------
 -export([
+	 first/0,
+	 first/2,
+	 restart_hosts/0,
+	
 	 new_cluster/0,
 	 call/4,
 	 ping/0
@@ -54,8 +58,16 @@ stop()-> gen_server:call(?SERVER, {stop},infinity).
 %%
 ping()-> 
     gen_server:call(?SERVER, {ping},infinity).
+restart_hosts()-> 
+    gen_server:call(?SERVER, {restart_hosts},infinity).
+
 call(Host,M,F,A)-> 
     gen_server:call(?SERVER, {call,Host,M,F,A},infinity).
+first()-> 
+    gen_server:call(?SERVER, {first},infinity).
+first(FirstHostId,DepId)-> 
+    gen_server:call(?SERVER, {first,FirstHostId,DepId},infinity).
+
 new_cluster()-> 
     gen_server:call(?SERVER, {new_cluster},infinity).
 

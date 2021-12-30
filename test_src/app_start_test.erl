@@ -51,11 +51,31 @@ start()->
 %% --------------------------------------------------------------------
 
 setup()->
+    ok=application:start(sd),
+    ok=application:start(bully),
+    ok=application:start(dbase_infra),
+    ok=application:start(logger_infra),
+    
+    Ids=lists:sort(db_host:ids()),
+    Ids=[{"c100","host1"},
+	 {"c100","host2"},
+	 {"c100","host3"},
+	 {"c100","host4"}],
 
+%    Nodes=[db_host:node(Id)||Id<-Ids],
+%    [host1@c100,host2@c100,host3@c100,host4@c100]=Nodes,
+%    [rpc:call(Node,init,stop,[],1000)||Node<-Nodes],
+%    timer:sleep(1000),
+%    {ok,AppInfo}=host_desired_state:start(),
+%    [{{"c100","host1"},host1@c100},
+%     {{"c100","host2"},host2@c100},
+%     {{"c100","host3"},host3@c100}, 
+%     {{"c100","host4"},host4@c100}]=lists:keysort(2,AppInfo),
+    ok=application:start(host),
+ %   Date=date(),
+ %   [Date,Date,Date,Date]=[rpc:call(Node,erlang,date,[],1000)||Node<-Nodes],
     ok=application:start(oam),
     
-   
- 
     ok.
 
 
