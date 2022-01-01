@@ -80,12 +80,7 @@ start()->
 %% -------------------------------------------------------------------
 first()->
     {ok,ControllerNode}=oam:first(),
-    %% Connec to tty
-    {_VmId,HostId}=misc_node:vmid_hostid(node()),
-    NodeTTY=list_to_atom("tty@"++HostId),
-    ok=rpc:call(NodeTTY,tty,connect,[ControllerNode],5*1000),
       
-    
 
     ok.
 

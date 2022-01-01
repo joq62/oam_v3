@@ -32,41 +32,33 @@
 %% Returns: non
 %% --------------------------------------------------------------------
 get_controllers()->
-    
     HostNodes=[db_host:node(Id)||Id<-db_host:ids(),
 				pong=:=net_adm:ping(db_host:node(Id))],
     get_controllers(HostNodes).
 
 get_controllers(HostNodes)->
-    Controllers=case rpc:multicall(HostNodes, erlang,nodes,[],5*1000) of
-		    {ResL,BadNodes}->
-			ResL1=[Node||Node<-lists:append(ResL),
-				     true/=lists:member(Node,HostNodes)],
-			ResL2=rm_duplicates(ResL1),
-			case rpc:multicall(ResL2,sd,get,[controller],5*1000) of
-			    {ResL3,BadNodes}->
-				%rpc:call(node(),io,format,["AllNodes ~p~n",[ResL2]],5*1000),
-				rm_duplicates(lists:append(ResL3))
-			end
-		end,
-    Controllers.
-
-%% --------------------------------------------------------------------
-%% Function:tes cases
-%% Description: List of test cases 
-%% Returns: non
-%% --------------------------------------------------------------------
-rm_duplicates(List)->
-   lists:reverse(rm_duplicates(List,[])).
-rm_duplicates([],SingleList)->
-    SingleList;
-rm_duplicates([{_,_}|T],Acc)->
-    rm_duplicates(T,Acc);
-rm_duplicates([Term|T],Acc)->
-    NewAcc=case lists:member(Term,T) of
-	       false->
-		   [Term|Acc];
-	       true->
-		   Acc
+   % io:format("HostNodes ~p~n",[{HostNodes,?MODULE,?FUNCTION_NAME,?LINE}]),
+    {ResL,BadNodes}=rpc:multicall(HostNodes, erlang,nodes,[],5*1000),
+    AllNodes=[Node||Node<-lists:append(ResL),
+		 true/=lists:member(Node,HostNodes)],
+   % io:format("AllNodes ~p~n",[{AllNodes,?MODULE,?FUNCTION_NAME,?LINE}]),
+    NoDuplicatesAllNodes=misc:rm_duplicates(AllNodes),
+   % io:format("NoDuplicatesAllNodes ~p~n",[{NoDuplicatesAllNodes,?MODULE,?FUNCTION_NAME,?LINE}]),
+    {SdResL,BadNodes}=rpc:multicall(NoDuplicatesAllNodes,sd,get,[controller],5*1000),
+  %  io:format("SdResL ~p~n",[{SdResL,?MODULE,?FUNCTION_NAME,?LINE}]),
+    ErrorList=[{Error,Reason}||{Error,Reason}<-lists:append(SdResL)],
+    Controllers=[Controller||Controller<-lists:append(SdResL),
+			     false=:=lists:member(Controller,ErrorList)],
+    Result=case Controllers of
+	       []->
+		   case ErrorList of
+		       []->
+			   {error,[no_controller_nodes,?MODULE,?FUNCTION_NAME,?LINE]}; 
+		       ErrorList->
+			   {error,[ErrorList,BadNodes,?MODULE,?FUNCTION_NAME,?LINE]}
+		   end;
+	       Controllers->
+		   misc:rm_duplicates(Controllers)
 	   end,
-    rm_duplicates(T,NewAcc).
+    Result.
+
