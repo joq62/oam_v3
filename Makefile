@@ -13,7 +13,7 @@ all:
 	cp ../dbase_infra/src/*.app ebin;
 	erlc -I ../../include -I ../controller/include -I ../dbase_infra/include -o ebin ../dbase_infra/src/*.erl;
 #	host
-	erlc -o ebin ../host/src/pod.erl;
+	erlc -I ../../include -I ../controller/include -o ebin ../host/src/pod.erl;
 #	app
 	cp src/*.app ebin;
 	erlc -I ../../include -I ../controller/include -I ../dbase_infra/include -o ebin src/*.erl;

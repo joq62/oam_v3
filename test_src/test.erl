@@ -35,9 +35,9 @@ start()->
     ok=init_test:start(),
     io:format("~p~n",[{"Stop init_test()",?MODULE,?FUNCTION_NAME,?LINE}]),
 
- %  io:format("~p~n",[{"Start dbase_test()",?MODULE,?FUNCTION_NAME,?LINE}]),
- %   ok=dbase_test(),
- %   io:format("~p~n",[{"Stop dbase_test()",?MODULE,?FUNCTION_NAME,?LINE}]),
+ %  io:format("~p~n",[{"Start monkey_test()",?MODULE,?FUNCTION_NAME,?LINE}]),
+    ok=monkey_test:start(),
+    io:format("~p~n",[{"Stop monkey_test()",?MODULE,?FUNCTION_NAME,?LINE}]),
 
  %   ok= controller_test:start(),
  %   io:format("~p~n",[{"Stop controller_test()",?MODULE,?FUNCTION_NAME,?LINE}]),

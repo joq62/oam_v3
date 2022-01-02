@@ -45,9 +45,15 @@ get_controllers(HostNodes)->
     NoDuplicatesAllNodes=misc:rm_duplicates(AllNodes),
    % io:format("NoDuplicatesAllNodes ~p~n",[{NoDuplicatesAllNodes,?MODULE,?FUNCTION_NAME,?LINE}]),
     {SdResL,BadNodes}=rpc:multicall(NoDuplicatesAllNodes,sd,get,[controller],5*1000),
-  %  io:format("SdResL ~p~n",[{SdResL,?MODULE,?FUNCTION_NAME,?LINE}]),
-    ErrorList=[{Error,Reason}||{Error,Reason}<-lists:append(SdResL)],
-    Controllers=[Controller||Controller<-lists:append(SdResL),
+%    io:format("SdResL ~p~n",[{SdResL,?MODULE,?FUNCTION_NAME,?LINE}]),
+%    A=[{badrpc,{'EXIT',{undef,[{sd,get,[controller],[]},
+%			       {rpc,'-handle_call_call/6-fun-0-',5,
+%				[{file,"rpc.erl"},{line,197}]}]}}}],
+
+    ErrorList=[{Error,Reason}||{Error,Reason}<-SdResL],
+    SdResL1=[X||X<-SdResL,
+		false=:=lists:member(X,ErrorList)],
+    Controllers=[Controller||Controller<-lists:append(SdResL1),
 			     false=:=lists:member(Controller,ErrorList)],
     Result=case Controllers of
 	       []->
