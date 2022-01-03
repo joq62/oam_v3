@@ -35,6 +35,10 @@ start()->
     ok=pass1(),
     io:format("~p~n",[{"Stop pass1()",?MODULE,?FUNCTION_NAME,?LINE}]),
 
+%   io:format("~p~n",[{"Start kill_bill()",?MODULE,?FUNCTION_NAME,?LINE}]),
+    ok=kill_bill(),
+    io:format("~p~n",[{"Stop kill_bill()",?MODULE,?FUNCTION_NAME,?LINE}]),
+
  %   io:format("~p~n",[{"Start desired_state()",?MODULE,?FUNCTION_NAME,?LINE}]),
    % ok=desired_state(),
   %  io:format("~p~n",[{"Stop desired_state()",?MODULE,?FUNCTION_NAME,?LINE}]),
@@ -81,7 +85,10 @@ cleanup()->
 %% Description: Initiate the eunit tests, set upp needed processes etc
 %% Returns: non
 %% --------------------------------------------------------------------
+kill_bill()->
+    
 
+    ok.
 %% --------------------------------------------------------------------
 %% Function:start/0 
 %% Description: Initiate the eunit tests, set upp needed processes etc
