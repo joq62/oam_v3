@@ -24,15 +24,11 @@
 %% ====================================================================
 %% External functions
 %% ====================================================================
-
-
-%% --------------------------------------------------------------------
-%% Function:tes cases
-%% Description: List of test cases 
-%% Returns: non
-%% --------------------------------------------------------------------
 first()->
-    Result=case pod:restart_hosts_nodes() of
+    
+   
+ %   Result=case pod:restart_hosts_nodes() of
+    Result=case restart_hosts_nodes() of
 	       {error,StartRes}->
 		   {error,StartRes};
 	       {ok,HostIdNodesList}-> %[{HostId,HostNode}]
@@ -63,6 +59,28 @@ first()->
 		    
     Result.
     
+restart_hosts_nodes()->
+    [rpc:call(db_host:node(HostId),init,stop,[],5*1000)||HostId<-db_host:ids()],
+    start_hosts(db_host:ids(),[]).
+    
+start_hosts([],StartRes)->
+    case [{HostId,HostNode}||{ok,[HostId,HostNode]}<-StartRes] of
+	[]->
+	    {error,StartRes};
+	HostIdNodesList->
+	    {ok,HostIdNodesList}
+    end;   
+start_hosts([HostId|T],Acc)->
+    start_hosts(T,[pod:ssh_start(HostId)|Acc]).
+    
+
+%% --------------------------------------------------------------------
+%% Function:tes cases
+%% Description: List of test cases 
+%% Returns: non
+%% --------------------------------------------------------------------
+
+
 first(FirstHostId,DepId)->
     %FirstHostNode=db_host:node(FirstHostId),
     [PodId]=db_deployment:pod_specs(DepId),
@@ -87,5 +105,3 @@ first(FirstHostId,DepId)->
 %% Description: List of test cases 
 %% Returns: non
 %% --------------------------------------------------------------------
-
-    
