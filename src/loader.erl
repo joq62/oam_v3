@@ -61,19 +61,17 @@ first()->
     
 restart_hosts_nodes()->
     [rpc:call(db_host:node(HostId),init,stop,[],5*1000)||HostId<-db_host:ids()],
-    pod:map_ssh_start(db_host:ids()).
-   
-% start_hosts(db_host:ids(),[]).
+     start_hosts(db_host:ids(),[]).
     
-%start_hosts([],StartRes)->
- %   case [{HostId,HostNode}||{ok,[HostId,HostNode]}<-StartRes] of
-%	[]->
-%%	    {error,StartRes};
-%	HostIdNodesList->
-%	    {ok,HostIdNodesList}
- %   end;   
-%start_hosts([HostId|T],Acc)->
- %   start_hosts(T,[pod:ssh_start(HostId)|Acc]).
+start_hosts([],StartRes)->
+    case [{HostId,HostNode}||{ok,[HostId,HostNode]}<-StartRes] of
+	[]->
+	    {error,StartRes};
+	HostIdNodesList->
+	    {ok,HostIdNodesList}
+    end;   
+start_hosts([HostId|T],Acc)->
+    start_hosts(T,[pod:ssh_start(HostId)|Acc]).
     
 
 %% --------------------------------------------------------------------
